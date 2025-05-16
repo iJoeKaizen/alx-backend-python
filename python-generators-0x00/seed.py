@@ -9,7 +9,7 @@ def connect_db():
         return mysql.connector.connect(
             host='localhost',
             user='root',                  # MySQL username
-            password='42UN$$iLegit',      # MySQL password
+            password='',      # MySQL password
         )
     except Error as e:
         print(f"Error connecting to MySQL: {e}")
@@ -30,7 +30,7 @@ def connect_to_prodev():
         return mysql.connector.connect(
             host='localhost',
             user='root',                    # MySQL username
-            password='42UN$$iLegit',        # MySQL password
+            password='',        # MySQL password
             database='ALX_prodev'
         )
     except Error as e:
