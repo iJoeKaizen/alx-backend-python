@@ -1,21 +1,17 @@
-seed = __import__('seed')
-
-connection = seed.connect_db()
-if connection:
-    seed.create_database(connection)
-    connection.close()
-    print(f"connection successful")
-
+        from seed import connect_to_prodev
+# import mysql.connector 
+from mysql.connector import Error
 
 def stream_users():
     """Generator function that streams users from the database one by one"""
+    connection = None
+    cursor = None
     try:
-   
-        connection = seed.connect_to_prodev()
-        if connection is None:
+        connection = connect_to_prodev()
+        if not connection:
             raise Exception("Failed to connect to the database")
         
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(dictionary=True, buffered=True)
         
         # Execute query and stream results
         cursor.execute("SELECT * FROM user_data")
@@ -24,14 +20,18 @@ def stream_users():
         while True:
             row = cursor.fetchone()
             if row is None:
+                # Ensure all rows are processed
+                while cursor.fetchoneone() is not None:
+                    pass
                 break
             yield row
             
-    except e as e:
+    except Error as e:
         print(f"Database error: {e}")
     finally:
-        if 'connection' in locals() and connection.is_connected():
-            cursor.close()
+        if cursor:
+             cursor.close()
+        if connection and connection.is_connected():
             connection.close()
 
 
