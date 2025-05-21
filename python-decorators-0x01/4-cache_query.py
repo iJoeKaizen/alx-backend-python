@@ -1,7 +1,6 @@
 import time
 import sqlite3 
 import functools
-from functools import lru_cache  # Alternative approach
 
 # Global query cache dictionary
 query_cache = {}
