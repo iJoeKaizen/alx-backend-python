@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Unit test module for utils.access_nested_map function.
+Unit test module for utils module
 """
 import unittest
 from parameterized import parameterized
@@ -9,7 +9,7 @@ from unittest.mock import patch, Mock
 
 class TestAccessNestedMap(unittest.TestCase):
     """
-    Test class for the access_nested_map function.
+    Test class for access_nested_map function
     """
     @parameterized.expand([
         ({"a": 1}, ("a",), 1),
@@ -30,14 +30,9 @@ class TestAccessNestedMap(unittest.TestCase):
             access_nested_map(nested_map, path)
         self.assertEqual(str(context.exception), f"'{expected_key}'")
 
-
-
 class TestGetJson(unittest.TestCase):
     """
-    Test class for the get_json function.
-    
-    This class contains test cases to verify the correct behavior of the get_json function
-    when fetching JSON data from URLs.
+    Test class for get_json function
     """
     @parameterized.expand([
         ("http://example.com", {"payload": True}),
@@ -45,14 +40,7 @@ class TestGetJson(unittest.TestCase):
     ])
     @patch('utils.requests.get')
     def test_get_json(self, test_url, test_payload, mock_get):
-        """
-        Test that get_json returns the expected result without making actual HTTP calls.
-        
-        Args:
-            test_url (str): URL to fetch JSON data from.
-            test_payload (dict): Expected JSON payload.
-            mock_get (Mock): Mocked requests.get method.
-        """
+        """Test get_json returns expected result"""
         mock_response = Mock()
         mock_response.json.return_value = test_payload
         mock_get.return_value = mock_response
@@ -62,37 +50,28 @@ class TestGetJson(unittest.TestCase):
         mock_get.assert_called_once_with(test_url)
         self.assertEqual(result, test_payload)
 
-
-
 class TestMemoize(unittest.TestCase):
     """
-    Test class for the memoize decorator.
-    
-    This class contains test cases to verify that the memoize decorator
-    correctly caches the result of a method after its first invocation.
+    Test class for memoize decorator
     """
     def test_memoize(self):
-        """
-        Test that the memoize decorator caches method results properly.
-        """
+        """Test memoization caches results properly"""
         class TestClass:
-            """
-            Inner test class for memoization testing.
-            """
+            """Test class for memoization"""
             def a_method(self):
-                """Method to be memoized."""
+                """Method to be memoized"""
                 return 42
             
             @memoize
             def a_property(self):
-                """Memoized property that calls a_method."""
+                """Memoized property"""
                 return self.a_method()
         
         with patch.object(TestClass, 'a_method', return_value=42) as mock_method:
             test_instance = TestClass()
-            # First call
             self.assertEqual(test_instance.a_property(), 42)
-            # Second call
             self.assertEqual(test_instance.a_property(), 42)
-            # Verify a_method is called only once
             mock_method.assert_called_once()
+
+if __name__ == '__main__':
+    unittest.main()
