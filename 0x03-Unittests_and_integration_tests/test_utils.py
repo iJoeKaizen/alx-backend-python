@@ -20,6 +20,7 @@ class TestAccessNestedMap(unittest.TestCase):
     def test_access_nested_map(self, nested_map, path, expected):
         """Test valid path access"""
         self.assertEqual(access_nested_map(nested_map, path), expected)
+
     @parameterized.expand([
         ({}, ("a",), 'a'),
         ({"a": 1}, ("a", "b"), 'b'),
@@ -61,11 +62,12 @@ class TestMemoize(unittest.TestCase):
             def a_method(self):
                 """Method to be memoized"""
                 return 42
-            
+
             @memoize
             def a_property(self):
                 """Memoized property"""
                 return self.a_method()
+        
         with patch.object(
                 TestClass, 'a_method', return_value=42) as mock_method:
             test_instance = TestClass()
