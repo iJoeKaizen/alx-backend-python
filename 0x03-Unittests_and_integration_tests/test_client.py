@@ -9,7 +9,8 @@ from client import GithubOrgClient
 
 # Import fixtures from fixtures.py
 try:
-    from fixtures import TEST_PAYLOAD, ORG_PAYLOAD, REPOS_PAYLOAD, EXPECTED_REPOS, APACHE2_REPOS
+    from fixtures import TEST_PAYLOAD, ORG_PAYLOAD
+    from fixtures import REPOS_PAYLOAD, EXPECTED_REPOS, APACHE2_REPOS
 except ImportError:
     # Fallback in case fixtures aren't available
     TEST_PAYLOAD = [({}, [], [], [])]
@@ -19,30 +20,31 @@ except ImportError:
     APACHE2_REPOS = []
 
 
-@parameterized_class(("org_payload", "repos_payload", "expected_repos", "apache2_repos"), TEST_PAYLOAD)
+@parameterized_class(("org_payload", "repos_payload",
+"expected_repos", "apache2_repos"), TEST_PAYLOAD)
 class TestIntegrationGithubOrgClient(unittest.TestCase):
     """
     Integration test class for GithubOrgClient
     """
-    
+
     @classmethod
     def setUpClass(cls):
         """Set up class-wide mocks for integration tests"""
         # Create patcher for requests.get
         cls.get_patcher = patch('requests.get')
         cls.mock_get = cls.get_patcher.start()
-        
+
         # Configure mock responses
         cls.org_mock = Mock()
         cls.org_mock.json.return_value = cls.org_payload
-        
+
         cls.repos_mock = Mock()
         cls.repos_mock.json.return_value = cls.repos_payload
-        
+
         # Set up side effect to return different responses based on URL
         cls.mock_get.side_effect = [
             cls.org_mock,   # First call: organization data
-            cls.repos_mock, # Second call: repositories data
+            cls.repos_mock,      # Second call: repositories data
         ]
 
     @classmethod
@@ -55,7 +57,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         client = GithubOrgClient("test_org")
         repos = client.public_repos()
         self.assertEqual(repos, self.expected_repos)
-        
+
         # Verify API calls were made
         self.assertEqual(self.mock_get.call_count, 2)
         self.mock_get.assert_any_call("https://api.github.com/orgs/test_org")
@@ -66,7 +68,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         client = GithubOrgClient("test_org")
         repos = client.public_repos(license="apache-2.0")
         self.assertEqual(repos, self.apache2_repos)
-        
+
         # Verify API calls were made
         self.assertEqual(self.mock_get.call_count, 2)
         self.mock_get.assert_any_call("https://api.github.com/orgs/test_org")
