@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # tests/test_client.py
 import unittest
 from unittest.mock import patch
