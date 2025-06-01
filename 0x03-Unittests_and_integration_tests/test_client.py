@@ -33,10 +33,6 @@ class TestGithubOrgClient(unittest.TestCase):
         self.assertEqual(result, expected_payload)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 
 class TestGithubOrgClient(unittest.TestCase):
     """Test class for GithubOrgClient"""
@@ -61,3 +57,6 @@ class TestGithubOrgClient(unittest.TestCase):
         
         # Verify the org property was accessed
         mock_org.assert_called_once()
+
+if __name__ == "__main__":
+    unittest.main()
