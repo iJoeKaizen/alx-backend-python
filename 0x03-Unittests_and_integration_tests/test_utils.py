@@ -6,6 +6,7 @@ Covers: access_nested_map, get_json, memoize.
 
 # tests/test_utils.py
 import pytest
+import unittest
 from unittest.mock import patch, Mock
 from utils import access_nested_map, get_json, memoize
 
@@ -54,8 +55,8 @@ class TestGetJson:
                 get_json("http://example.com")
 
 
-class TestMemoize:
-    def test_memoize_caching(self):
+class TestMemoize(unittest.TestCase):
+    def test_memoize(self):
         class TestClass:
             def a_method(self):
                 return 42
@@ -66,8 +67,8 @@ class TestMemoize:
 
         with patch.object(TestClass, "a_method", return_value=42) as mock_method:
             test = TestClass()
-            assert test.a_property() == 42
-            assert test.a_property() == 42
+            self.assertEqual(test.a_property(), 42)
+            self.assertEqual(test.a_property(), 42)
             mock_method.assert_called_once()
 
     def test_memoize_multiple_instances(self):
@@ -85,8 +86,8 @@ class TestMemoize:
         with patch.object(TestClass, "compute", return_value=99) as mock_method:
             t1 = TestClass(1)
             t2 = TestClass(2)
-            assert t1.cached_value() == 99
-            assert t2.cached_value() == 99
-            assert t1.cached_value() == 99
-            assert t2.cached_value() == 99
-            assert mock_method.call_count == 2
+            self.assertEqual(t1.cached_value(), 99)
+            self.assertEqual(t2.cached_value(), 99)
+            self.assertEqual(t1.cached_value(), 99)
+            self.assertEqual(t2.cached_value(), 99)
+            self.assertEqual(mock_method.call_count, 2)
