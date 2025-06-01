@@ -58,7 +58,7 @@ class TestGetJson:
 
 
 class TestMemoize:
-    def test_memoize(self):
+    def test_memoize_caches_result(self):
         class TestClass:
             def a_method(self):
                 return 42
@@ -102,7 +102,7 @@ class TestMemoize:
             # Verify compute was called only once per instance
             assert mock_compute.call_count == 2
 
-    def test_memoize_method_isolation(self):
+    def test_memoize_cache_isolation_between_methods(self):
         class TestClass:
             @memoize
             def method1(self):
