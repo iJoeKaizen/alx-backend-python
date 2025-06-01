@@ -31,26 +31,29 @@ class TestGithubOrgClient(unittest.TestCase):
         mock_get_json.assert_called_once_with(expected_url)
         self.assertEqual(result, expected_payload)
 
-    @patch('client.GithubOrgClient.org', new_callable=PropertyMock)
-    def test_public_repos_url(self, mock_org):
+    def test_public_repos_url(self):
         """Test that _public_repos_url returns correct value from org payload"""
         # Setup test payload with known repos_url
         test_payload = {
             "repos_url": "https://api.github.com/orgs/google/repos"
         }
-        mock_org.return_value = test_payload
         
-        # Create client instance
-        client = GithubOrgClient("google")
-        
-        # Access the property
-        result = client._public_repos_url
-        
-        # Verify result matches expected value
-        self.assertEqual(result, test_payload["repos_url"])
-        
-        # Verify the org property was accessed
-        mock_org.assert_called_once()
+        # Patch the org property using context manager
+        with patch('client.GithubOrgClient.org', 
+                   new_callable=PropertyMock) as mock_org:
+            mock_org.return_value = test_payload
+            
+            # Create client instance
+            client = GithubOrgClient("google")
+            
+            # Access the property
+            result = client._public_repos_url
+            
+            # Verify result matches expected value
+            self.assertEqual(result, test_payload["repos_url"])
+            
+            # Verify the org property was accessed
+            mock_org.assert_called_once()
 
 
 if __name__ == "__main__":
