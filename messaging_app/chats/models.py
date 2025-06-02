@@ -87,17 +87,23 @@ class Message(models.Model):
         help_text='User who sent this message',
         db_column='sender_id'
     )
-    content = models.TextField(help_text='Actual message content')
-    timestamp = models.DateTimeField(auto_now_add=True)
+    message_body = models.TextField(
+        help_text='Content of the message',
+        verbose_name='Message Body'
+    )
+    sent_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Sent At'
+    )
     is_read = models.BooleanField(
         default=False,
         help_text='Has the message been read by the recipient?'
     )
     
     class Meta:
-        ordering = ['timestamp']
+        ordering = ['sent_at']
         verbose_name = 'Message'
         verbose_name_plural = 'Messages'
     
     def __str__(self):
-        return f"{self.sender.email}: {self.content[:50]}"
+        return f"{self.sender.email}: {self.message_body[:50]}"
