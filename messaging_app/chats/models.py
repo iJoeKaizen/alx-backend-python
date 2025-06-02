@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.core.validators import EmailValidator
+from django.utils.translation import gettext_lazy as _
 
 class User(AbstractUser):
     """Custom user model with UUID primary key and additional fields"""
@@ -25,7 +26,6 @@ class User(AbstractUser):
     online_status = models.BooleanField(default=False)
     
     # Password field is inherited from AbstractUser
-    # but we'll explicitly reference it in the model
     password = models.CharField(_("password"), max_length=128)
     
     # Authentication configuration
@@ -41,10 +41,11 @@ class User(AbstractUser):
 
 class Conversation(models.Model):
     """Model representing a conversation between users"""
-    id = models.UUIDField(
+    conversation_id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
-        editable=False
+        editable=False,
+        verbose_name='Conversation ID'
     )
     participants = models.ManyToManyField(
         User,
@@ -66,22 +67,25 @@ class Conversation(models.Model):
 
 class Message(models.Model):
     """Model representing a message within a conversation"""
-    id = models.UUIDField(
+    message_id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
-        editable=False
+        editable=False,
+        verbose_name='Message ID'
     )
-    conversation = models.ForeignKey(
+    conversation_id = models.ForeignKey(
         Conversation,
         related_name='messages',
         on_delete=models.CASCADE,
-        help_text='Conversation this message belongs to'
+        help_text='Conversation this message belongs to',
+        db_column='conversation_id'
     )
     sender = models.ForeignKey(
         User,
         related_name='sent_messages',
         on_delete=models.CASCADE,
-        help_text='User who sent this message'
+        help_text='User who sent this message',
+        db_column='sender_id'
     )
     content = models.TextField(help_text='Actual message content')
     timestamp = models.DateTimeField(auto_now_add=True)
