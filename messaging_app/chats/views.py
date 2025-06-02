@@ -220,3 +220,8 @@ class MessageViewSet(viewsets.ModelViewSet):
                 {'conversation_id': 'Invalid conversation ID'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+    pagination_class = PageNumberPagination
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 100
