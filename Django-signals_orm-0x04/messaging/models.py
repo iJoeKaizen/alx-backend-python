@@ -16,23 +16,31 @@ class Message(models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
     is_read = models.BooleanField(default=False)
+    # Add edited tracking fields
+    edited = models.BooleanField(default=False)
+    last_edited = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"Message from {self.sender} to {self.receiver}"
 
-class Notification(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='notifications'
-    )
+class MessageHistory(models.Model):
     message = models.ForeignKey(
         Message,
         on_delete=models.CASCADE,
-        related_name='notifications'
+        related_name='history'
     )
-    timestamp = models.DateTimeField(default=timezone.now)
-    is_read = models.BooleanField(default=False)
+    old_content = models.TextField()
+    edit_timestamp = models.DateTimeField(default=timezone.now)
+    edited_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    class Meta:
+        ordering = ['-edit_timestamp']
+        verbose_name_plural = "Message Histories"
 
     def __str__(self):
-        return f"Notification for {self.user} about message #{self.message.id}"
+        return f"History for message #{self.message.id} at {self.edit_timestamp}"
