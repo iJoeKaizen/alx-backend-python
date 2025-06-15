@@ -18,7 +18,7 @@ class Message(models.Model):
     is_read = models.BooleanField(default=False)
     # Add edited tracking fields
     edited = models.BooleanField(default=False)
-    last_edited = models.DateTimeField(null=True, blank=True)
+    edited_at = models.DateTimeField(null=True, blank=True)  # Changed to edited_at
 
     def __str__(self):
         return f"Message from {self.sender} to {self.receiver}"
@@ -30,7 +30,7 @@ class MessageHistory(models.Model):
         related_name='history'
     )
     old_content = models.TextField()
-    edit_timestamp = models.DateTimeField(default=timezone.now)
+    edited_at = models.DateTimeField(default=timezone.now)  # Consistent naming
     edited_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -39,8 +39,8 @@ class MessageHistory(models.Model):
     )
 
     class Meta:
-        ordering = ['-edit_timestamp']
+        ordering = ['-edited_at']
         verbose_name_plural = "Message Histories"
 
     def __str__(self):
-        return f"History for message #{self.message.id} at {self.edit_timestamp}"
+        return f"History for message #{self.message.id} at {self.edited_at}"
