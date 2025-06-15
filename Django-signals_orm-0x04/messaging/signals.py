@@ -1,14 +1,43 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
-from .models import Message, Notification
+from .models import Message, MessageHistory
+from django.contrib.auth import get_user_model
+from django.utils import timezone
 
-@receiver(post_save, sender=Message)
-def create_message_notification(sender, instance, created, **kwargs):
+User = get_user_model()
+
+@receiver(pre_save, sender=Message)
+def log_message_edit(sender, instance, **kwargs):
     """
-    Creates a notification for the receiver when a new message is created.
+    Logs message content before it's edited
     """
-    if created:
-        Notification.objects.create(
-            user=instance.receiver,
-            message=instance
-        )
+    if instance.pk:  # Only for existing messages (edits)
+        try:
+            original = Message.objects.get(pk=instance.pk)
+            if original.content != instance.content:  # Content changed
+                # Get current user (if available)
+                editor = None
+                try:
+                    # Check if editor was set in the view
+                    if hasattr(instance, '_editor'):
+                        editor = instance._editor
+                    # Fallback to request-based approach
+                    elif hasattr(Message, 'request'):
+                        request = Message.request
+                        if request and hasattr(request, 'user'):
+                            editor = request.user
+                except Exception:
+                    pass
+                
+                # Create history record
+                MessageHistory.objects.create(
+                    message=instance,
+                    old_content=original.content,
+                    edited_by=editor
+                )
+                
+                # Update message flags
+                instance.edited = True
+                instance.last_edited = timezone.now()
+        except Message.DoesNotExist:
+            pass  # New message, nothing to log
